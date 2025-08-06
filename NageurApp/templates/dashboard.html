@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Tableau de bord du coach</h2>
+
+  <!-- Formulaire pour la longueur du bassin -->
+  <form id="poolForm" class="row g-3 mb-4">
+    <div class="col-auto">
+      <label for="longueur" class="visually-hidden">Longueur du bassin (m)</label>
+      <input type="number" class="form-control" id="longueur" placeholder="Longueur du bassin" name="longueur" required min="1">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary mb-3">Définir</button>
+    </div>
+  </form>
+
+  <div id="feedback" class="alert d-none" role="alert"></div>
+    <!-- BOUTON ON/OFF -->
+       <div class="form-check form-switch d-flex align-items-center">
+        <input class="form-check-input me-2" type="checkbox" role="switch" id="toggleModule" onchange="toggleArduino(this)">
+        <label class="form-check-label" for="toggleModule">Module</label>
+        </div>
+
+
+  <!-- Cartes avec nouvelle disposition -->
+  <div class="row mb-4">
+    {% set cards = [
+      {'id': 'mouvements-bras-value', 'label': 'Mouvements Bras', 'color': 'info', 'icon': 'fa-hand-rock'},
+      {'id': 'bpm-moyen-value', 'label': 'BPM Moyen', 'color': 'secondary', 'icon': 'fa-heartbeat'},
+      {'id': 'batterie-value', 'label': 'Batterie', 'color': 'warning', 'icon': 'fa-battery-half'},
+      {'id': 'bpm-value', 'label': 'BPM Actuel', 'color': 'primary', 'icon': 'fa-heart'},
+      {'id': 'vitesse-value', 'label': 'Vitesse (m/s)', 'color': 'success', 'icon': 'fa-tachometer-alt'},
+      {'id': 'swolf-value', 'label': 'Indice SWOLF', 'color': 'dark', 'icon': 'fa-swimmer'},
+      {'id': 'longueurs-value', 'label': 'Longueurs', 'color': 'danger', 'icon': 'fa-ruler-horizontal'}
+    ] %}
+
+    {% for card in cards %}
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-{{ card.color }}">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas {{ card.icon }} fa-2x text-{{ card.color }}"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">{{ card.label }}</h6>
+          <p class="fs-4 fw-bold mb-0" id="{{ card.id }}">--</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Graphiques -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <canvas id="bpmChart"></canvas>
+    </div>
+    <div class="col-md-6 mb-4">
+      <canvas id="vitesseChart"></canvas>
+    </div>
+    <div class="col-md-6 mb-4">
+      <canvas id="swolfChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let bpmChart, vitesseChart, swolfChart;
+  let bpmData = [], vitesseData = [], swolfData = [], labels = [];
+
+  function createCharts() {
+    const commonOptions = {
+      responsive: true,
+      scales: {
+        x: { display: false },
+        y: { beginAtZero: true }
+      }
+    };
+
+    bpmChart = new Chart(document.getElementById('bpmChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'BPM',
+          data: bpmData,
+          borderColor: 'blue',
+          tension: 0.3
+        }]
+      },
+      options: commonOptions
+    });
+
+    vitesseChart = new Chart(document.getElementById('vitesseChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Vitesse',
+          data: vitesseData,
+          borderColor: 'green',
+          tension: 0.3
+        }]
+      },
+      options: commonOptions
+    });
+
+    swolfChart = new Chart(document.getElementById('swolfChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'SWOLF',
+          data: swolfData,
+          borderColor: 'black',
+          tension: 0.3
+        }]
+      },
+      options: commonOptions
+    });
+  }
+
+  async function fetchData() {
+    const res = await fetch('/data');
+    const json = await res.json();
+
+    const now = new Date().toLocaleTimeString();
+    labels.push(now);
+    bpmData.push(json.bpm || 0);
+    vitesseData.push(json.vitesse || 0);
+    swolfData.push(json.swolf || 0);
+
+    if (labels.length > 10) {
+      labels.shift();
+      bpmData.shift();
+      vitesseData.shift();
+      swolfData.shift();
+    }
+
+    bpmChart.update();
+    vitesseChart.update();
+    swolfChart.update();
+
+    // Mise à jour des valeurs
+    document.getElementById('bpm-value').innerText = json.bpm ?? '--';
+    document.getElementById('vitesse-value').innerText = json.vitesse ?? '--';
+    document.getElementById('swolf-value').innerText = json.swolf ?? '--';
+    document.getElementById('mouvements-bras-value').innerText = json.mouvements_bras ?? '--';
+    document.getElementById('bpm-moyen-value').innerText = json.bpm_moyen ?? '--';
+    document.getElementById('batterie-value').innerText = json.niveau_batterie ?? '--';
+    document.getElementById('longueurs-value').innerText = json.nombre_longueurs ?? '--';
+  }
+
+  document.getElementById('poolForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const longueur = document.getElementById('longueur').value;
+    const res = await fetch('/set_pool_length', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ longueur })
+    });
+
+    const feedback = document.getElementById('feedback');
+    if (res.ok) {
+      feedback.className = 'alert alert-success';
+      feedback.innerText = 'Longueur du bassin enregistrée avec succès.';
+    } else {
+      feedback.className = 'alert alert-danger';
+      feedback.innerText = 'Erreur lors de l\'enregistrement.';
+    }
+    feedback.classList.remove('d-none');
+  });
+
+  createCharts();
+  setInterval(fetchData, 3000);
+
+  
+  function toggleArduino(elem) {
+    const etat = elem.checked ? 'on' : 'off';
+
+    fetch(`/arduino/${etat}`, {
+      method: 'POST'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Échec");
+      return res.text();
+    })
+    .then(msg => console.log(msg))
+    .catch(err => console.error('Erreur Arduino:', err));
+  }
+
+
+</script>
+{% endblock %}
