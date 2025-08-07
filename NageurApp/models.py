@@ -10,20 +10,25 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
     bassin_longueur = db.Column(db.Float, nullable=False)
-    longueurs = db.Column(db.Integer, nullable=False)
     mouvements_bras = db.Column(db.Integer, nullable=False)
     temps_total = db.Column(db.Float, nullable=False)
     bpm_instantane = db.Column(db.Float, nullable=False)
 
-    bpm_logs = db.relationship('BpmLog', backref='session', cascade='all, delete', lazy=True)
 
-class BpmLog(db.Model):
-    __tablename__ = 'bpm_logs'
+class Bassin(db.Model):
+    __tablename__ = 'bassin'
 
     id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'), nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    bpm = db.Column(db.Float)
+    longueur = db.Column(db.Float, nullable=False)
+
+
+# class BpmLog(db.Model):
+#     __tablename__ = 'bpm_logs'
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     session_id = db.Column(db.Integer, db.ForeignKey('sessions.id'), nullable=True)
+#     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+#     bpm = db.Column(db.Float)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

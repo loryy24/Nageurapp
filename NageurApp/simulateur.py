@@ -2,7 +2,7 @@ import random
 import time
 from datetime import datetime
 import threading
-from .models import db, BpmLog  # ⚠️ À adapter si l'import ne fonctionne pas selon ton arborescence
+from .models import db  # ⚠️ À adapter si l'import ne fonctionne pas selon ton arborescence
 from flask import current_app
 
 data_buffer = []
@@ -26,8 +26,6 @@ def simulate_data():
                 data_buffer.pop(0)
 
             # Sauvegarde dans la base
-            log = BpmLog(bpm=bpm)
-            db.session.add(log)
             db.session.commit()
 
             time.sleep(2)

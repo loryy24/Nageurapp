@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<!-- <div class="container mt-4"> -->
   <h2 class="mb-4 text-center">Tableau de bord du coach</h2>
 
   <!-- Formulaire pour la longueur du bassin -->
-  <form id="poolForm" class="row g-3 mb-4">
+  <form id="poolForm" action="/set_pool_length" method="POST" class="row g-3 mb-4">
     <div class="col-auto">
       <label for="longueur" class="visually-hidden">Longueur du bassin (m)</label>
       <input type="number" class="form-control" id="longueur" placeholder="Longueur du bassin" name="longueur" required min="1">
     </div>
     <div class="col-auto">
-      <button type="submit" class="btn btn-primary mb-3">Définir</button>
+      <input type="submit" class="btn btn-primary mb-3" value="Définir">
     </div>
   </form>
 
@@ -62,7 +62,7 @@
       <canvas id="swolfChart"></canvas>
     </div>
   </div>
-</div>
+<!-- </div> -->
 
 <!-- ChartJS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -152,26 +152,6 @@
     document.getElementById('batterie-value').innerText = json.niveau_batterie ?? '--';
     document.getElementById('longueurs-value').innerText = json.nombre_longueurs ?? '--';
   }
-
-  document.getElementById('poolForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const longueur = document.getElementById('longueur').value;
-    const res = await fetch('/set_pool_length', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ longueur })
-    });
-
-    const feedback = document.getElementById('feedback');
-    if (res.ok) {
-      feedback.className = 'alert alert-success';
-      feedback.innerText = 'Longueur du bassin enregistrée avec succès.';
-    } else {
-      feedback.className = 'alert alert-danger';
-      feedback.innerText = 'Erreur lors de l\'enregistrement.';
-    }
-    feedback.classList.remove('d-none');
-  });
 
   createCharts();
   setInterval(fetchData, 3000);

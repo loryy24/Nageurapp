@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from .simulateur import data_buffer, simulate_data
-from .models import db, Session, BpmLog, User
+from .models import db, Session, User, Bassin
 import threading
 
 
@@ -35,9 +35,9 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-        thread = threading.Thread(target=simulate_data)
-        thread.daemon = True
-        thread.start()
+        # thread = threading.Thread(target=simulate_data)
+        # thread.daemon = True
+        # thread.start()
 
     # AUTHENTIFICATION
 
@@ -93,8 +93,7 @@ def create_app():
     @app.route('/')
     @login_required
     def index():
-        donnees = data_buffer[-1] if data_buffer else {}
-        return render_template('index.html', donnees=donnees)
+        return redirect(url_for('dashboard'))
 
     @app.route('/dashboard')
     @login_required
@@ -134,5 +133,15 @@ def create_app():
             except Exception as e:
                 return f"Erreur lors de l'envoi : {e}", 500
         return "Arduino non connecté", 500
+
+    @app.post('/set_pool_length')
+    @login_required
+    def set_length():
+        longueur = request.form.get('longueur', type=int)
+        print(f"Longueur du bassin définie : {longueur} mètres")
+        bassin = Bassin(longueur=longueur)
+        db.session.add(bassin)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
 
     return app
