@@ -103,7 +103,7 @@ def create_app():
     @app.route('/historique')
     @login_required
     def historique():
-        historique = BpmLog.query.order_by(BpmLog.timestamp.desc()).limit(50).all()
+        historique = []
         return render_template('historique.html', historique=historique)
 
     @app.route('/data')
