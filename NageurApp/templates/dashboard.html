@@ -1,8 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- <div class="container mt-4"> -->
-  <h2 class="mb-4 text-center">Tableau de bord du coach</h2>
+<style>
+  /* Réduction générale des tailles */
+  body {
+    font-size: 1rem;
+  }
+  .card {
+    padding: 0.5rem;
+  }
+  .card .card-title {
+    font-size: 1.1rem;
+  }
+  .card p {
+    font-size: 1rem;
+  }
+  canvas {
+    max-height: 300px !important;
+  }
+</style>
+
+<h3 class="text-center">Tableau de bord du coach</h3>
 
   <!-- Formulaire pour la longueur du bassin -->
   <div class="row">
@@ -24,109 +42,61 @@
     </div>
   </div>
 
-  <div id="feedback" class="alert d-none" role="alert"></div>
-    <!-- BOUTON ON/OFF -->
-       <div class="form-check form-switch d-flex align-items-center">
-        <input class="form-check-input me-2" type="checkbox" role="switch" id="toggleModule" onchange="toggleArduino(this)">
-        <label class="form-check-label" for="toggleModule">Module</label>
-        </div>
+<div id="feedback" class="alert d-none p-1 mb-1" role="alert"></div>
 
+<div class="form-check form-switch d-flex align-items-center mb-2">
+  <input class="form-check-input me-1" type="checkbox" role="switch" id="toggleModule" onchange="toggleArduino(this)">
+  <label class="form-check-label small" for="toggleModule">Module</label>
+</div>
 
-  <!-- Cartes avec nouvelle disposition -->
-  <div class="row mb-4">
-
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-info">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-hand-rock fa-2x text-info"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">Mouvements Bras</h6>
-          <p class="fs-4 fw-bold mb-0" id="mouvements-bras-value">{{ mouvements_bras }}</p>
-        </div>
+<div class="row g-1 mb-2">
+  {% set infos = [
+    ('Mouvements Bras', mouvements_bras, 'fas fa-hand-rock text-info', 'border-info'),
+    ('BPM Moyen', bpm_moyen, 'fas fa-heartbeat text-secondary', 'border-secondary'),
+    ('Batterie', battery, 'fas fa-battery-half text-warning', 'border-warning'),
+    ('BPM Actuel', bpm_instantanne, 'fas fa-heart text-primary', 'border-primary'),
+    ('Vitesse (m/s)', vitesse, 'fas fa-tachometer-alt text-success', 'border-success'),
+    ('Indice SWOLF', swolf, 'fas fa-swimmer text-dark', 'border-dark'),
+    ('Longueurs', nb_longueurs, 'fas fa-ruler-horizontal text-danger', 'border-danger')
+  ] %}
+  {% for titre, valeur, icon, border in infos %}
+  <div class="col-6 col-md-3 mb-1">
+    <div class="card h-100 shadow-sm d-flex flex-row align-items-center border-start border-3 {{ border }}">
+      <div class="d-flex align-items-center justify-content-center p-1" style="width: 40px;">
+        <i class="{{ icon }} fa-lg"></i>
       </div>
-    </div>
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-secondary">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-heartbeat fa-2x text-secondary"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">BPM Moyen</h6>
-          <p class="fs-4 fw-bold mb-0" id="bpm-moyen-value">{{ bpm_moyen }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-warning">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-battery-half fa-2x text-warning"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">Batterie</h6>
-          <p class="fs-4 fw-bold mb-0" id="batterie-value">{{ battery }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-primary">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-heart fa-2x text-primary"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">BPM Actuel</h6>
-          <p class="fs-4 fw-bold mb-0" id="bpm-value">{{ bpm_instantanne }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-success">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-tachometer-alt fa-2x text-success"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">Vitesse (m/s)</h6>
-          <p class="fs-4 fw-bold mb-0" id="vitesse-value">{{ vitesse }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-dark">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-swimmer fa-2x text-dark"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">Indice SWOLF</h6>
-          <p class="fs-4 fw-bold mb-0" id="swolf-value">{{ swolf }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-danger">
-        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas fa-ruler-horizontal fa-2x text-danger"></i>
-        </div>
-        <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">Longueurs</h6>
-          <p class="fs-4 fw-bold mb-0" id="longueurs-value">{{ nb_longueurs }}</p>
-        </div>
+      <div class="card-body py-1">
+        <h6 class="card-title mb-0">{{ titre }}</h6>
+        <p class="fw-bold mb-0" style="font-size:1.2rem;">{{ valeur }}</p>
       </div>
     </div>
   </div>
+  {% endfor %}
+</div>
 
-  <!-- Graphiques -->
-  <div class="row">
-    <div class="col-md-6 mb-4">
-      <canvas id="bpmChart"></canvas>
-    </div>
-    <div class="col-md-6 mb-4">
-      <canvas id="vitesseChart"></canvas>
-    </div>
-    <div class="col-md-6 mb-4">
-      <canvas id="swolfChart"></canvas>
-    </div>
+<ul class="nav nav-tabs mb-1" id="chartTabs" role="tablist" style="font-size:1rem;">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active py-1 px-2" id="bpm-tab" data-bs-toggle="tab" data-bs-target="#bpm-pane" type="button" role="tab">BPM</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link py-1 px-2" id="vitesse-tab" data-bs-toggle="tab" data-bs-target="#vitesse-pane" type="button" role="tab">Vitesse</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link py-1 px-2" id="swolf-tab" data-bs-toggle="tab" data-bs-target="#swolf-pane" type="button" role="tab">SWOLF</button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade show active" id="bpm-pane" role="tabpanel">
+    <canvas id="bpmChart"></canvas>
   </div>
-<!-- </div> -->
+  <div class="tab-pane fade" id="vitesse-pane" role="tabpanel">
+    <canvas id="vitesseChart"></canvas>
+  </div>
+  <div class="tab-pane fade" id="swolf-pane" role="tabpanel">
+    <canvas id="swolfChart"></canvas>
+  </div>
+</div>
 
 <!-- ChartJS -->
 <script src="/static/chartjs/chart.umd.min.js"></script>
@@ -249,5 +219,14 @@
       .then(msg => console.log(msg))
       .catch(err => console.error(err));
   }
+
+  document.querySelectorAll('#chartTabs button[data-bs-toggle="tab"]').forEach(tab => {
+    tab.addEventListener('shown.bs.tab', function () {
+      bpmChart.resize();
+      vitesseChart.resize();
+      swolfChart.resize();
+    });
+  });
+
 </script>
 {% endblock %}
