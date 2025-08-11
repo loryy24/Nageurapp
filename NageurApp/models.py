@@ -4,19 +4,29 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
+class Info(db.Model):
+    __tablename__ = 'infos'
+
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, nullable=False)
+    bassin_id = db.Column(db.Integer, nullable=False)
+    nb_longueurs = db.Column(db.Integer, nullable=False)
+    battery = db.Column(db.Integer, nullable=False)
+    mouvements_bras = db.Column(db.Integer, nullable=False)
+    vitesse = db.Column(db.Float, nullable=False)
+    temps_total = db.Column(db.Float, nullable=False)
+    bpm = db.Column(db.Float, nullable=False)
+    swolf = db.Column(db.Float, nullable=False)
+    
 class Session(db.Model):
     __tablename__ = 'sessions'
 
     id = db.Column(db.Integer, primary_key=True)
+    # numero = db.Column(db.Integer, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    bassin_longueur = db.Column(db.Float, nullable=False)
-    mouvements_bras = db.Column(db.Integer, nullable=False)
-    temps_total = db.Column(db.Float, nullable=False)
-    bpm_instantane = db.Column(db.Float, nullable=False)
-
-
+    
 class Bassin(db.Model):
-    __tablename__ = 'bassin'
+    __tablename__ = 'bassins'
 
     id = db.Column(db.Integer, primary_key=True)
     longueur = db.Column(db.Float, nullable=False)

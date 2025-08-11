@@ -5,15 +5,24 @@
   <h2 class="mb-4 text-center">Tableau de bord du coach</h2>
 
   <!-- Formulaire pour la longueur du bassin -->
-  <form id="poolForm" action="/set_pool_length" method="POST" class="row g-3 mb-4">
-    <div class="col-auto">
-      <label for="longueur" class="visually-hidden">Longueur du bassin (m)</label>
-      <input type="number" class="form-control" id="longueur" placeholder="Longueur du bassin" name="longueur" required min="1">
+  <div class="row">
+    <div class="col">
+      <form id="poolForm" action="/set_pool_length" method="POST" class="row g-3 mb-4">
+        <div class="col-auto align-self-start form group">
+          <label for="longueur" class="form-label">Longueur du bassin (m)</label>
+          <input type="text" class="form-control" id="longueur" value="{{ longueur_bassin }}" name="longueur" required min="1">
+        </div>
+        <div class="col-auto align-self-end">
+          <input type="submit" class="btn btn-primary mb-3" value="Définir">
+        </div>
+      </form>
     </div>
-    <div class="col-auto">
-      <input type="submit" class="btn btn-primary mb-3" value="Définir">
+    <div class="col">
+      <form action="/begin" method="POST" class="text-end">
+          <input type="submit" class="btn btn-success mb-3" value="Démarrer Session">
+      </form>
     </div>
-  </form>
+  </div>
 
   <div id="feedback" class="alert d-none" role="alert"></div>
     <!-- BOUTON ON/OFF -->
@@ -25,29 +34,84 @@
 
   <!-- Cartes avec nouvelle disposition -->
   <div class="row mb-4">
-    {% set cards = [
-      {'id': 'mouvements-bras-value', 'label': 'Mouvements Bras', 'color': 'info', 'icon': 'fa-hand-rock'},
-      {'id': 'bpm-moyen-value', 'label': 'BPM Moyen', 'color': 'secondary', 'icon': 'fa-heartbeat'},
-      {'id': 'batterie-value', 'label': 'Batterie', 'color': 'warning', 'icon': 'fa-battery-half'},
-      {'id': 'bpm-value', 'label': 'BPM Actuel', 'color': 'primary', 'icon': 'fa-heart'},
-      {'id': 'vitesse-value', 'label': 'Vitesse (m/s)', 'color': 'success', 'icon': 'fa-tachometer-alt'},
-      {'id': 'swolf-value', 'label': 'Indice SWOLF', 'color': 'dark', 'icon': 'fa-swimmer'},
-      {'id': 'longueurs-value', 'label': 'Longueurs', 'color': 'danger', 'icon': 'fa-ruler-horizontal'}
-    ] %}
 
-    {% for card in cards %}
     <div class="col-md-4 mb-3">
-     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-{{ card.color }}">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-info">
         <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
-          <i class="fas {{ card.icon }} fa-2x text-{{ card.color }}"></i>
+          <i class="fas fa-hand-rock fa-2x text-info"></i>
         </div>
         <div class="card-body flex-grow-1">
-          <h6 class="card-title mb-1">{{ card.label }}</h6>
-          <p class="fs-4 fw-bold mb-0" id="{{ card.id }}">--</p>
+          <h6 class="card-title mb-1">Mouvements Bras</h6>
+          <p class="fs-4 fw-bold mb-0" id="mouvements-bras-value">{{ mouvements_bras }}</p>
         </div>
       </div>
     </div>
-    {% endfor %}
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-secondary">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas fa-heartbeat fa-2x text-secondary"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">BPM Moyen</h6>
+          <p class="fs-4 fw-bold mb-0" id="bpm-moyen-value">{{ bpm_moyen }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-warning">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas fa-battery-half fa-2x text-warning"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">Batterie</h6>
+          <p class="fs-4 fw-bold mb-0" id="batterie-value">{{ battery }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-primary">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas fa-heart fa-2x text-primary"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">BPM Actuel</h6>
+          <p class="fs-4 fw-bold mb-0" id="bpm-value">{{ bpm_instantanne }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-success">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas fa-tachometer-alt fa-2x text-success"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">Vitesse (m/s)</h6>
+          <p class="fs-4 fw-bold mb-0" id="vitesse-value">{{ vitesse }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-dark">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas fa-swimmer fa-2x text-dark"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">Indice SWOLF</h6>
+          <p class="fs-4 fw-bold mb-0" id="swolf-value">{{ swolf }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+     <div class="card h-100 shadow d-flex flex-row align-items-center border-start border-4 border-danger">
+        <div class="d-flex align-items-center justify-content-center p-3" style="width: 60px;">
+          <i class="fas fa-ruler-horizontal fa-2x text-danger"></i>
+        </div>
+        <div class="card-body flex-grow-1">
+          <h6 class="card-title mb-1">Longueurs</h6>
+          <p class="fs-4 fw-bold mb-0" id="longueurs-value">{{ nb_longueurs }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Graphiques -->
@@ -65,7 +129,7 @@
 <!-- </div> -->
 
 <!-- ChartJS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/chartjs/chart.umd.min.js"></script>
 <script>
   let bpmChart, vitesseChart, swolfChart;
   let bpmData = [], vitesseData = [], swolfData = [], labels = [];
@@ -98,7 +162,7 @@
       data: {
         labels,
         datasets: [{
-          label: 'Vitesse',
+          label: 'Vitesse (m/s)',
           data: vitesseData,
           borderColor: 'green',
           tension: 0.3
@@ -123,54 +187,67 @@
   }
 
   async function fetchData() {
-    const res = await fetch('/data');
-    const json = await res.json();
+    try {
+      const res = await fetch('/get_data');
+      const json = await res.json();
 
-    const now = new Date().toLocaleTimeString();
-    labels.push(now);
-    bpmData.push(json.bpm || 0);
-    vitesseData.push(json.vitesse || 0);
-    swolfData.push(json.swolf || 0);
+      if (!json.success || !json.data) {
+        console.warn("Pas de données reçues");
+        return;
+      }
 
-    if (labels.length > 10) {
-      labels.shift();
-      bpmData.shift();
-      vitesseData.shift();
-      swolfData.shift();
+      const data = json.data;
+
+      // Mise à jour des tableaux
+      labels = data.temps_list || [];
+      bpmData = data.bpm_list || [];
+      vitesseData = data.vitesse_list || [];
+      swolfData = data.swolf_list || [];
+
+      // Limite à 20 points
+      if (labels.length > 20) {
+        labels = labels.slice(-20);
+        bpmData = bpmData.slice(-20);
+        vitesseData = vitesseData.slice(-20);
+        swolfData = swolfData.slice(-20);
+      }
+
+      // Mise à jour Chart.js
+      bpmChart.data.labels = labels;
+      bpmChart.data.datasets[0].data = bpmData;
+      bpmChart.update();
+
+      vitesseChart.data.labels = labels;
+      vitesseChart.data.datasets[0].data = vitesseData;
+      vitesseChart.update();
+
+      swolfChart.data.labels = labels;
+      swolfChart.data.datasets[0].data = swolfData;
+      swolfChart.update();
+
+      // Mise à jour des cartes
+      document.getElementById('bpm-value').innerText = data.bpm_instantanne ?? '--';
+      document.getElementById('vitesse-value').innerText = data.vitesse ?? '--';
+      document.getElementById('swolf-value').innerText = data.swolf ?? '--';
+      document.getElementById('mouvements-bras-value').innerText = data.mouvements_bras ?? '--';
+      document.getElementById('bpm-moyen-value').innerText = data.bpm_moyen ?? '--';
+      document.getElementById('batterie-value').innerText = data.battery ?? '--';
+      document.getElementById('longueurs-value').innerText = data.nb_longueurs ?? '--';
+
+    } catch (err) {
+      console.error("Erreur de récupération des données :", err);
     }
-
-    bpmChart.update();
-    vitesseChart.update();
-    swolfChart.update();
-
-    // Mise à jour des valeurs
-    document.getElementById('bpm-value').innerText = json.bpm ?? '--';
-    document.getElementById('vitesse-value').innerText = json.vitesse ?? '--';
-    document.getElementById('swolf-value').innerText = json.swolf ?? '--';
-    document.getElementById('mouvements-bras-value').innerText = json.mouvements_bras ?? '--';
-    document.getElementById('bpm-moyen-value').innerText = json.bpm_moyen ?? '--';
-    document.getElementById('batterie-value').innerText = json.niveau_batterie ?? '--';
-    document.getElementById('longueurs-value').innerText = json.nombre_longueurs ?? '--';
   }
 
   createCharts();
-  setInterval(fetchData, 3000);
+  setInterval(fetchData, 1000);
 
-  
   function toggleArduino(elem) {
     const etat = elem.checked ? 'on' : 'off';
-
-    fetch(`/arduino/${etat}`, {
-      method: 'POST'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("Échec");
-      return res.text();
-    })
-    .then(msg => console.log(msg))
-    .catch(err => console.error('Erreur Arduino:', err));
+    fetch(`/arduino/${etat}`, { method: 'POST' })
+      .then(res => res.ok ? res.text() : Promise.reject("Erreur Arduino"))
+      .then(msg => console.log(msg))
+      .catch(err => console.error(err));
   }
-
-
 </script>
 {% endblock %}

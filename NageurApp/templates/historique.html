@@ -10,26 +10,26 @@
         <table class="table table-hover align-middle">
             <thead class="table-dark">
                <tr>
+                <th>#</th>
                 <th>Date</th>
-                <th>Nageur</th>
                 <th>Longueur bassin (m)</th>
                 <th>Nombre_longueurs</th>
                 <th>Mouvements bras</th>
                 <th>BPM moyen</th>
-                <th>SWOLF</th>
+                <th>SWOLF moyen</th>
                 <th>Vitesse moyenne (m/s)</th>
             </tr>
             </thead>
             <tbody>
-                {% for data in historique %}
+                {% for data in history %}
             <tr>
-                <td>{{ data.date.strftime('%d/%m/%Y') }}</td>
-                <td>{{ data.nageur }}</td>
+                <td>{{ data.session_id }}</td>
+                <td>{{ data.date }}</td>
                 <td>{{ data.longueur_bassin }}</td>
-                <td>{{ data.nombre_longueurs }}</td>
+                <td>{{ data.nb_longueurs }}</td>
                 <td>{{ data.mouvements_bras }}</td>
                 <td>{{ data.bpm_moyen }}</td>
-                <td>{{ data.swolf }}</td>
+                <td>{{ data.swolf_moyen }}</td>
                 <td>{{ data.vitesse_moyenne }}</td>
             </tr>
                 {% else %}
