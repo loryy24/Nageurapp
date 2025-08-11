@@ -51,15 +51,15 @@
 
 <div class="row g-1 mb-2">
   {% set infos = [
-    ('Mouvements Bras', mouvements_bras, 'fas fa-hand-rock text-info', 'border-info'),
-    ('BPM Moyen', bpm_moyen, 'fas fa-heartbeat text-secondary', 'border-secondary'),
-    ('Batterie', battery, 'fas fa-battery-half text-warning', 'border-warning'),
-    ('BPM Actuel', bpm_instantanne, 'fas fa-heart text-primary', 'border-primary'),
-    ('Vitesse (m/s)', vitesse, 'fas fa-tachometer-alt text-success', 'border-success'),
-    ('Indice SWOLF', swolf, 'fas fa-swimmer text-dark', 'border-dark'),
-    ('Longueurs', nb_longueurs, 'fas fa-ruler-horizontal text-danger', 'border-danger')
+    ('Mouvements Bras', mouvements_bras, 'fas fa-hand-rock text-info', 'border-info', 'mouvements-bras-value'),
+    ('BPM Moyen', bpm_moyen, 'fas fa-heartbeat text-secondary', 'border-secondary', 'bpm-moyen-value'),
+    ('Batterie', battery, 'fas fa-battery-half text-warning', 'border-warning', 'batterie-value'),
+    ('BPM Actuel', bpm_instantanne, 'fas fa-heart text-primary', 'border-primary', 'bpm-value'),
+    ('Vitesse (m/s)', vitesse, 'fas fa-tachometer-alt text-success', 'border-success', 'vitesse-value'),
+    ('Indice SWOLF', swolf, 'fas fa-swimmer text-dark', 'border-dark', 'swolf-value'),
+    ('Longueurs', nb_longueurs, 'fas fa-ruler-horizontal text-danger', 'border-danger', 'longueurs-value')
   ] %}
-  {% for titre, valeur, icon, border in infos %}
+  {% for titre, valeur, icon, border, id in infos %}
   <div class="col-6 col-md-3 mb-1">
     <div class="card h-100 shadow-sm d-flex flex-row align-items-center border-start border-3 {{ border }}">
       <div class="d-flex align-items-center justify-content-center p-1" style="width: 40px;">
@@ -67,7 +67,7 @@
       </div>
       <div class="card-body py-1">
         <h6 class="card-title mb-0">{{ titre }}</h6>
-        <p class="fw-bold mb-0" style="font-size:1.2rem;">{{ valeur }}</p>
+        <p id="{{ id }}" class="fw-bold mb-0" style="font-size:1.2rem;">{{ valeur }}</p>
       </div>
     </div>
   </div>
