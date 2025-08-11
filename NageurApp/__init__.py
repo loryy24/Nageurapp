@@ -1,9 +1,7 @@
 from datetime import datetime
-import threading
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user
 from sqlalchemy import select, func
-from .simulateur import data_buffer, simulate_data
 from .models import db, Session, User, Info, Bassin
 
 
@@ -12,7 +10,7 @@ def create_app():
     app.secret_key = 'secret-key'  # À changer en production
 
     # Config BDD
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/nageur_db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
@@ -267,6 +265,10 @@ def create_app():
     @app.post('/set_data')
     def set_data():
         data = request.json
+        
+        if Session.query.count() == 0 or Bassin.query.count() == 0:
+            return jsonify(success=False, message="Longueur de bassin non définie ou Aucune session débutée."), 400
+        
         info = Info(
             session_id = Session.query.order_by(Session.id.desc()).first().id,
             bassin_id = Bassin.query.order_by(Bassin.id.desc()).first().id,
